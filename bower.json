@@ -1,0 +1,25 @@
+{
+  "name": "medium-editor-toolbar-states",
+  "version": "0.0.1",
+  "homepage": "https://github.com/davideanderson/medium-editor-toolbar-states-plugin",
+  "authors": [
+    "David E Anderson"
+  ],
+  "description": "An extension to show different medium-editor toolbar buttons based on the context of the selection",
+  "main": "dist/medium-editor-toolbar-states.js",
+  "keywords": [
+    "MediumEditor",
+    "medium-editor",
+    "toolbar",
+    "buttons"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "medium-editor": "^5.0.0"
+  }
+}

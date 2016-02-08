@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medium Editor Toolbar States Example</title>
+    <link rel="stylesheet" href="../bower_components/medium-editor/dist/css/medium-editor.min.css">
+    <link rel="stylesheet" href="../bower_components/medium-editor/dist/css/themes/default.min.css">
+    <script src="../bower_components/medium-editor/dist/js/medium-editor.js"></script>
+    <script src="../src/main.js"></script>
+    <style>
+        .hide-me {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+<h1>Medium Editor Toolbar States Example</h1>
+<div class="editable">
+    <p>Select me to see standard toolbar</p>
+    <h2>Select me to see alternate toolbar</h2>
+</div>
+<script>
+    var editor = new MediumEditor('.editable', {
+        toolbar: {
+            buttons: ['bold', 'italic', 'underline', 'h2', 'h3', 'h4', 'h5', 'quote', 'anchor']
+        },
+        extensions: {
+            'toolbar_states': new MediumEditorToolbarStates({
+                states: {
+                    standard: {
+                        buttons: ['bold', 'italic', 'underline', 'h2', 'h3', 'quote', 'anchor']
+                    },
+                    alternate: {
+                        buttons: ['h2', 'h3', 'h4', 'h5', 'quote']
+                    }
+                },
+                stateSelector: function(element) {
+                    var range = element.ownerDocument.getSelection().getRangeAt(0);
+                    var current = range.commonAncestorContainer;
+                    if (current.nodeName === 'P' ||
+                        (current.nodeName === '#text' && current.parentNode.nodeName === 'P')) {
+                        return 'standard';
+                    } else {
+                        return 'alternate';
+                    }
+                },
+                hideClass: 'hide-me'
+            })
+        }
+    });
+</script>
+</body>
+</html>
