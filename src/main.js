@@ -11,10 +11,9 @@ var MediumEditorToolbarStates = MediumEditor.Extension.extend({
     },
 
     handlePositionToolbar: function (data, editor) {
-        var selection = this.window.getSelection(),
-            state;
-        if (this.stateSelector && typeof this.stateSelector === 'function') {
-            var stateName = this.stateSelector(editor);
+        var state;
+        if (this.getStateName && typeof this.getStateName === 'function') {
+            var stateName = this.getStateName(editor);
             state = this.states[stateName];
         } else if (this.getState && typeof this.getState === 'function') {
             state = this.getState(editor);
@@ -26,17 +25,30 @@ var MediumEditorToolbarStates = MediumEditor.Extension.extend({
 
     updateToolbarState: function (state) {
         var toolbar = this.base.getExtensionByName('toolbar'),
-            that = this;
+            that = this,
+            firstButton, lastButton;
 
         toolbar.forEachExtension(function (extension) {
+            var button;
             if (typeof extension.getButton === 'function') {
                 if (state.buttons.indexOf(extension.name) != -1) {
-                    extension.getButton().classList.remove(that.hideClass);
+                    button = extension.getButton();
+                    button.classList.remove(that.hideClass);
+                    firstButton = firstButton || button;
+                    lastButton = button;
                 } else {
-                    extension.getButton().classList.add(that.hideClass);
+                    button = extension.getButton();
+                    button.classList.add(that.hideClass);
                 }
+                button.classList.remove(toolbar.firstButtonClass);
+                button.classList.remove(toolbar.lastButtonClass);
             }
         });
+
+        if (firstButton && lastButton) {
+            firstButton.classList.add(toolbar.firstButtonClass);
+            lastButton.classList.add(toolbar.lastButtonClass);
+        }
     }
 
 });
