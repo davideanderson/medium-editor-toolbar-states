@@ -8,8 +8,20 @@
     <script src="medium-editor.min.js"></script>
     <script src="src/main.js"></script>
     <style>
+        .editable {
+            color: blue;
+        }
+
         .hide-me {
             display: none !important;
+        }
+
+        /* Setting styles for first and last buttons, just to show they work as one would expect */
+        .medium-editor-button-first {
+            border-left: 2px solid yellow !important;
+        }
+        .medium-editor-button-last {
+            border-right: 2px solid yellow !important;
         }
     </style>
 </head>
@@ -19,7 +31,15 @@
     <p>Select me to see standard toolbar</p>
     <h2>Select me to see alternate toolbar</h2>
 </div>
+<hr/>
+<h2>A second editor, to show it works with more than one instance of an editor:</h2>
+<div class="editable">
+    <p>Select me to see standard toolbar</p>
+    <h2>Select me to see alternate toolbar</h2>
+</div>
 <script>
+    var pendingStateName = 'default';
+    var selectedStateName = 'default';
     var editor = new MediumEditor('.editable', {
         toolbar: {
             buttons: ['bold', 'italic', 'underline', 'h2', 'h3', 'h4', 'h5', 'quote', 'anchor']
@@ -27,22 +47,24 @@
         extensions: {
             'toolbar_states': new MediumEditorToolbarStates({
                 states: {
-                    standard: {
+                    default: {
                         buttons: ['bold', 'italic', 'underline', 'h2', 'h3', 'quote', 'anchor']
                     },
                     alternate: {
                         buttons: ['h2', 'h3', 'h4', 'h5', 'quote']
                     }
                 },
-                stateSelector: function(element) {
-                    var range = element.ownerDocument.getSelection().getRangeAt(0);
-                    var current = range.commonAncestorContainer;
-                    if (current.nodeName === 'P' ||
-                        (current.nodeName === '#text' && current.parentNode.nodeName === 'P')) {
-                        return 'standard';
-                    } else {
-                        return 'alternate';
+                checkState: function(node) {
+                    if (['H2', 'H3', 'H4', 'H5', 'BLOCKQUOTE'].indexOf(node.nodeName) >= 0) {
+                        pendingStateName = 'alternate';
                     }
+                    if (MediumEditor.util.isMediumEditorElement(node)) {
+                        selectedStateName = pendingStateName;
+                        pendingStateName = 'default';
+                    }
+                },
+                getStateName: function(element) {
+                    return selectedStateName;
                 },
                 hideClass: 'hide-me'
             })
