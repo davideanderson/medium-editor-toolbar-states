@@ -12,6 +12,14 @@
             color: blue;
         }
 
+        .editable2 {
+            color: red;
+        }
+
+        .editable3 {
+            color: green;
+        }
+
         .hide-me {
             display: none !important;
         }
@@ -26,21 +34,47 @@
     </style>
 </head>
 <body>
-<h1>Medium Editor Toolbar States Example</h1>
+<h1>Medium Editor Toolbar States Example, using nodeNames list</h1>
 <div class="editable">
     <p>Select me to see standard toolbar</p>
     <h2>Select me to see alternate toolbar</h2>
 </div>
 <hr/>
-<h2>A second editor, to show it works with more than one instance of an editor:</h2>
-<div class="editable">
+<h2>A second editor, using getStateNameForNode</h2>
+<div class="editable2">
     <p>Select me to see standard toolbar</p>
     <h2>Select me to see alternate toolbar</h2>
 </div>
+<hr/>
+<h2>Another editor, to show state selection based on attributes</h2>
+<div class="editable3">
+    <p>Select me to see standard toolbar</p>
+    <h2 data-toolbar-state="alternate">Select me to see alternate toolbar. Warning: changing the type of this block
+        from the toolbar will remove the attribute on this element, thus setting the toolbar to the default.
+        Custom modification of the default editor behavior is required to retain the toolbar state attributes</h2>
+</div>
 <script>
-    var pendingStateName = 'default';
-    var selectedStateName = 'default';
     var editor = new MediumEditor('.editable', {
+        toolbar: {
+            buttons: ['bold', 'italic', 'underline', 'h2', 'h3', 'h4', 'h5', 'quote', 'anchor']
+        },
+        extensions: {
+            'toolbar_states': new MediumEditorToolbarStates({
+                states: {
+                    default: {
+                        buttons: ['bold', 'italic', 'underline', 'h2', 'h3', 'quote', 'anchor']
+                    },
+                    alternate: {
+                        buttons: ['h2', 'h3', 'h4', 'h5', 'quote'],
+                        nodeNames: ['H2', 'H3', 'H4', 'H5', 'BLOCKQUOTE']
+                    }
+                },
+                hideClass: 'hide-me'
+            })
+        }
+    });
+
+    var editor2 = new MediumEditor('.editable2', {
         toolbar: {
             buttons: ['bold', 'italic', 'underline', 'h2', 'h3', 'h4', 'h5', 'quote', 'anchor']
         },
@@ -54,17 +88,29 @@
                         buttons: ['h2', 'h3', 'h4', 'h5', 'quote']
                     }
                 },
-                checkState: function(node) {
+                getStateNameForNode: function(node) {
                     if (['H2', 'H3', 'H4', 'H5', 'BLOCKQUOTE'].indexOf(node.nodeName) >= 0) {
-                        pendingStateName = 'alternate';
-                    }
-                    if (MediumEditor.util.isMediumEditorElement(node)) {
-                        selectedStateName = pendingStateName;
-                        pendingStateName = 'default';
+                        return 'alternate';
                     }
                 },
-                getStateName: function(element) {
-                    return selectedStateName;
+                hideClass: 'hide-me'
+            })
+        }
+    });
+
+    var editor3 = new MediumEditor('.editable3', {
+        toolbar: {
+            buttons: ['bold', 'italic', 'underline', 'h2', 'h3', 'h4', 'h5', 'quote', 'anchor']
+        },
+        extensions: {
+            'toolbar_states': new MediumEditorToolbarStates({
+                states: {
+                    default: {
+                        buttons: ['bold', 'italic', 'underline', 'h2', 'h3', 'quote', 'anchor']
+                    },
+                    alternate: {
+                        buttons: ['h2', 'h3', 'h4', 'h5', 'quote']
+                    }
                 },
                 hideClass: 'hide-me'
             })
